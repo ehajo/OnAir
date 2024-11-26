@@ -1,0 +1,357 @@
+CAMPlot
+-------
+
+Report Written : 25.11.2024 22:04:47
+Design Path    : C:\Users\Hannes\Documents\GitHub\OnAir\PCB\OnAir.pcb
+Design Title   : 
+Created        : 18.11.2024 20:51:21
+Last Saved     : 25.11.2024 22:04:43
+Editing Time   : 405 min
+
+Formatting Information
+----------------------
+
+    Gerber Output
+    -------------
+
+    Pulsonix 12.5 Gerber.dll 9449
+    3.5 Format Absolute millimetres.
+    Omit Leading zeroes.
+    G01 assumed throughout.
+    Line termination <*> <CR> <LF>.
+    Aperture table defined in output file (RS-274-X).
+    Hardware arcs allowed.
+
+    Excellon Drill Output
+    ---------------------
+
+    Pulsonix 12.5 NCDrill.dll 9449
+    3.5 Format Absolute Metric.
+    Omit leading zeros
+    Tool sizes are in     mm
+
+
+Plot Details
+------------
+
+    Gerber Output
+    -------------
+
+    Output File:     C:\Users\Hannes\Documents\GitHub\OnAir\PCB\003-CAM\OnAir(Top).gbr
+    Plot Name:       Top
+
+    Contains:        Top
+
+    Scale:           1.000
+    Mirrored:        No
+    Rotated:         No
+    Offset:          -436.21    -448.87mm
+    Step & Repeat:   Not used
+
+
+    D-Code   Description
+
+    D15      Round 0.50
+    D16      Round 0.30
+    D17      Round 0.41-
+    D18      Round 0.70
+    D19      Round 0.60
+    D70      Round 0.20+
+    D71      Round 0.25+
+    D20      Rectangle 1.00 x 1.50 Rotation 90
+    D21      Rectangle 1.00 x 1.50 Rotation 30
+    D22      Rectangle 1.00 x 1.50
+    D23      Rectangle 1.00 x 1.50 Rotation 150
+    D24      Rectangle 1.00 x 1.50 Rotation 23
+    D25      Rectangle 1.00 x 1.50 Rotation 163
+    D26      Rectangle 1.00 x 1.50 Rotation 17
+    D27      Rectangle 1.00 x 1.50 Rotation 45
+    D28      Rectangle 1.00 x 1.50 Rotation 135
+    D29      Rectangle 1.00 x 1.50 Rotation 24
+    D73      Rectangle 0.30 x 1.00
+    D74      Round 0.64-
+    D81      Oval 0.85 x 1.35
+
+    Gerber Output
+    -------------
+
+    Output File:     C:\Users\Hannes\Documents\GitHub\OnAir\PCB\003-CAM\OnAir(Bottom).gbr
+    Plot Name:       Bottom
+
+    Contains:        Bottom
+
+    Scale:           1.000
+    Mirrored:        No
+    Rotated:         No
+    Offset:          -436.21    -448.87mm
+    Step & Repeat:   Not used
+
+
+    D-Code   Description
+
+    D15      Round 0.50
+    D16      Round 0.30
+    D17      Round 0.41-
+    D18      Round 0.70
+    D19      Round 0.60
+    D70      Round 0.20+
+    D74      Round 0.64-
+    D75      Round 1.27
+    D76      Rectangle 0.90 x 1.40 Rotation 90
+    D78      Rectangle 0.90 x 1.40
+    D80      Rectangle 1.40 x 3.60
+    D81      Rectangle 0.70 x 2.00
+    D82      Oval 0.85 x 1.35
+    D83      Rectangle 1.00 x 1.80 Rotation 90
+
+    Gerber Output
+    -------------
+
+    Output File:     C:\Users\Hannes\Documents\GitHub\OnAir\PCB\003-CAM\OnAir(Silkscreen Top).gbr
+    Plot Name:       Silkscreen Top
+
+    Contains:        Silkscreen Top
+
+    Scale:           1.000
+    Mirrored:        No
+    Rotated:         No
+    Offset:          -436.21    -448.87mm
+    Step & Repeat:   Not used
+
+
+    D-Code   Description
+
+    D10      Round 0.30
+    D11      Round 0.20
+    D12      Round 0.00+
+    D14      Round 0.20+
+    D81      Round 0.15
+
+    Gerber Output
+    -------------
+
+    Output File:     C:\Users\Hannes\Documents\GitHub\OnAir\PCB\003-CAM\OnAir(Solder Mask Top).gbr
+    Plot Name:       Solder Mask Top
+
+    Contains:        Solder Mask Top
+
+    Scale:           1.000
+    Mirrored:        No
+    Rotated:         No
+    Offset:          -436.21    -448.87mm
+    Step & Repeat:   Not used
+
+
+    D-Code   Description
+
+    D81      Round 0.95+
+    D82      Round 0.85+
+    D83      Rectangle 1.25+ x 1.75+ Rotation 90
+    D84      Rectangle 1.25+ x 1.75+ Rotation 30
+    D85      Rectangle 1.25+ x 1.75+
+    D86      Rectangle 1.25+ x 1.75+ Rotation 150
+    D87      Rectangle 1.25+ x 1.75+ Rotation 23
+    D88      Rectangle 1.25+ x 1.75+ Rotation 163
+    D89      Rectangle 1.25+ x 1.75+ Rotation 17
+    D90      Rectangle 1.25+ x 1.75+ Rotation 45
+    D91      Rectangle 1.25+ x 1.75+ Rotation 135
+    D92      Rectangle 1.25+ x 1.75+ Rotation 24
+    D93      Oval 1.10+ x 1.60+
+    D94      Rectangle 0.55+ x 1.25+
+
+    Gerber Output
+    -------------
+
+    Output File:     C:\Users\Hannes\Documents\GitHub\OnAir\PCB\003-CAM\OnAir(Paste Mask Top).gbr
+    Plot Name:       Paste Mask Top
+
+    Contains:        Paste Mask Top
+
+    Scale:           1.000
+    Mirrored:        No
+    Rotated:         No
+    Offset:          -436.21    -448.87mm
+    Step & Repeat:   Not used
+
+
+    D-Code   Description
+
+    D20      Rectangle 1.00 x 1.50 Rotation 90
+    D21      Rectangle 1.00 x 1.50 Rotation 30
+    D22      Rectangle 1.00 x 1.50
+    D23      Rectangle 1.00 x 1.50 Rotation 150
+    D24      Rectangle 1.00 x 1.50 Rotation 23
+    D25      Rectangle 1.00 x 1.50 Rotation 163
+    D26      Rectangle 1.00 x 1.50 Rotation 17
+    D27      Rectangle 1.00 x 1.50 Rotation 45
+    D28      Rectangle 1.00 x 1.50 Rotation 135
+    D29      Rectangle 1.00 x 1.50 Rotation 24
+    D73      Rectangle 0.30 x 1.00
+
+    Gerber Output
+    -------------
+
+    Output File:     C:\Users\Hannes\Documents\GitHub\OnAir\PCB\003-CAM\OnAir(Silkscreen Bottom).gbr
+    Plot Name:       Silkscreen Bottom
+
+    Contains:        Silkscreen Bottom
+
+    Scale:           1.000
+    Mirrored:        No
+    Rotated:         No
+    Offset:          -436.21    -448.87mm
+    Step & Repeat:   Not used
+
+
+    D-Code   Description
+
+    D10      Round 0.30
+    D11      Round 0.20
+    D12      Round 0.00+
+    D13      Round 0.20
+    D81      Round 0.45
+    D82      Round 0.25
+
+    Gerber Output
+    -------------
+
+    Output File:     C:\Users\Hannes\Documents\GitHub\OnAir\PCB\003-CAM\OnAir(Solder Mask Bottom).gbr
+    Plot Name:       Solder Mask Bottom
+
+    Contains:        Solder Mask Bottom
+
+    Scale:           1.000
+    Mirrored:        No
+    Rotated:         No
+    Offset:          -436.21    -448.87mm
+    Step & Repeat:   Not used
+
+
+    D-Code   Description
+
+    D81      Round 0.95+
+    D82      Round 0.85+
+    D83      Rectangle 1.15+ x 1.65+ Rotation 90
+    D84      Rectangle 0.95+ x 2.25+
+    D85      Oval 1.10+ x 1.60+
+    D86      Rectangle 1.25+ x 2.05+ Rotation 90
+    D87      Rectangle 1.65+ x 3.85+
+    D88      Rectangle 1.15+ x 1.65+
+
+    Gerber Output
+    -------------
+
+    Output File:     C:\Users\Hannes\Documents\GitHub\OnAir\PCB\003-CAM\OnAir(Paste Mask Bottom).gbr
+    Plot Name:       Paste Mask Bottom
+
+    Contains:        Paste Mask Bottom
+
+    Scale:           1.000
+    Mirrored:        No
+    Rotated:         No
+    Offset:          -436.21    -448.87mm
+    Step & Repeat:   Not used
+
+
+    D-Code   Description
+
+    D76      Rectangle 0.90 x 1.40 Rotation 90
+    D78      Rectangle 0.90 x 1.40
+    D80      Rectangle 1.40 x 3.60
+    D81      Rectangle 0.70 x 2.00
+    D82      Rectangle 1.00 x 1.80 Rotation 90
+
+    Gerber Output
+    -------------
+
+    Output File:     C:\Users\Hannes\Documents\GitHub\OnAir\PCB\003-CAM\OnAir(Drill Drawing).gbr
+    Plot Name:       Drill Drawing
+
+    Contains:        <Through Hole>
+
+    Scale:           1.000
+    Mirrored:        No
+    Rotated:         No
+    Offset:          -436.21    -448.87mm
+    Step & Repeat:   Not used
+
+
+    D-Code   Description
+
+    D81      Round 0.40
+    D82      Round 0.10
+    D83      Round 0.30
+    D84      Round 3.10
+    D85      Round 0.60
+
+    Drill Table
+    -----------
+    Diam (thou)	Qty	Id	Plated
+
+    11.8	135 	AC	Yes
+    15.7	53  	A	Yes
+    122.0	4   	Q	No
+    23.6	4   	AE	Yes
+
+
+
+    Excellon Drill Output
+    ---------------------
+
+    Output File:     C:\Users\Hannes\Documents\GitHub\OnAir\PCB\003-CAM\OnAir(Through Hole).drl
+    Plot Name:       <Through Hole>
+
+    Contains:        <Through Hole>
+
+    Drill Type:      All
+    Scale:           1.000
+    Mirrored:        No
+    Rotated:         No
+    Offset:          -436.21    -448.87mm
+    Step & Repeat:   Not used
+
+
+    Format     1
+    FMAT statement included in output.
+    Tool sizes included in output.
+
+    Tool          Size     Count  Plated
+
+    T001        000.30000   135     Y
+    T002        000.40000    53     Y
+    T003        000.60000     4     Y
+    T004        003.10000     4     
+
+Summary Information
+-------------------
+
+    Outputs covered by CAM Plots
+    ----------------------------
+
+    Top: Gerber, Artwork, Enabled
+    Bottom: Gerber, Artwork, Enabled
+    Silkscreen Top: Gerber, Artwork, Enabled
+    Solder Mask Top: Gerber, Artwork, Enabled
+    Paste Mask Top: Gerber, Artwork, Enabled
+    Silkscreen Bottom: Gerber, Artwork, Enabled
+    Solder Mask Bottom: Gerber, Artwork, Enabled
+    Paste Mask Bottom: Gerber, Artwork, Enabled
+    Documentation: Windows, Artwork
+    <Through Hole>: Excellon, Drill, Enabled
+    Drill Drawing: Gerber, Drill Drawing, Enabled
+    ass_top: PDF, Artwork
+    ass_bot: PDF, Artwork
+
+    Outputs not covered by CAM Plots
+    --------------------------------
+
+    Layer Wires Top
+    Layer Pin Names
+    Layer PCB
+    Layer Pin Names (Bottom)
+    Layer Wires Bottom
+    Layer Construction Lines
+
+Plotting took 0.325 Seconds
+
+                ---------------- End Of Report ----------------
