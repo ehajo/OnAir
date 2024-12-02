@@ -1,0 +1,8 @@
+{
+    "channels": [
+        {"name": "ehajo", "color": [100, 44, 18]},
+        {"name": "whiteydude", "color": [0, 255, 0]},
+        {"name": "jvpeek", "color": [0, 0, 255]}
+    ],
+    "offline_color": [50, 50, 50]
+}
