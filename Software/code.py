@@ -50,7 +50,7 @@ def on_air_effect(online_color, offline_color):
     print("On-Air Effekt!")
     steps = 20  # Weniger Schritte für schnelleres Fading
     duration = 0.5  # Kürzere Dauer für einen Durchlauf (0.5 Sekunden)
-    effect_duration = 5  # Gesamtdauer des Effekts (30 Sekunden)
+    effect_duration = 5  # Gesamtdauer des Effekts (5 Sekunden)
     cycles = int(effect_duration / (duration * 2))  # Anzahl der Fading-Zyklen
     for _ in range(cycles):
         fade_between_colors(offline_color, online_color, steps, duration)
