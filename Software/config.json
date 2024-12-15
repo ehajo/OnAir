@@ -1,8 +1,35 @@
 {
     "channels": [
-        {"name": "ehajo", "color": [100, 44, 18]},
-        {"name": "whiteydude", "color": [0, 255, 0]},
-        {"name": "jvpeek", "color": [0, 0, 255]}
+        {
+			"name": "ehajo",
+            "letters": {
+                "O": {"color": [255, 112, 45], "brightness": 0.5},
+                "N": {"color": [0, 117, 179], "brightness": 0.5},
+                "A": {"color": [0, 117, 179], "brightness": 0.5},
+                "I": {"color": [0, 117, 179], "brightness": 0.5},
+                "R": {"color": [0, 117, 179], "brightness": 0.5}
+            }
+		},
+        {
+			"name": "whiteydude",
+            "letters": {
+                "O": {"color": [0, 255, 0], "brightness": 0.3},
+                "N": {"color": [0, 255, 0], "brightness": 0.3},
+                "A": {"color": [0, 255, 0], "brightness": 0.3},
+                "I": {"color": [0, 255, 0], "brightness": 0.3},
+                "R": {"color": [0, 255, 0], "brightness": 0.3}
+            }
+		},
+        {
+			"name": "jvpeek",
+            "letters": {
+                "O": {"color": [0, 0, 255], "brightness": 0.3},
+                "N": {"color": [0, 0, 255], "brightness": 0.3},
+                "A": {"color": [0, 0, 255], "brightness": 0.3},
+                "I": {"color": [0, 0, 255], "brightness": 0.3},
+                "R": {"color": [0, 0, 255], "brightness": 0.3}
+            }
+		}
     ],
     "offline_color": [50, 50, 50]
 }
