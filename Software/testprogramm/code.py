@@ -6,7 +6,7 @@ import random
 # --- NeoPixel-Setup ---
 pixel_pin = board.GP2
 num_pixels = 50  # Gesamtzahl der LEDs
-pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=1.0, auto_write=False)
+pixels = neopixel.NeoPixel(pixel_pin, num_pixels, brightness=0.1, auto_write=False)
 
 # --- Buchstabenbereiche definieren ---
 # Hinweis: LED1 entspricht Index 0, LED50 entspricht Index 49.

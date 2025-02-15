@@ -18,16 +18,16 @@ config = load_json("config.json")
 
 # NeoPixel-Setup
 pixel_pin = board.GP2
-num_pixels = 22  # Anzahl der LEDs
+num_pixels = 50  # Anzahl der LEDs
 pixels = neopixel.NeoPixel(pixel_pin, num_pixels, auto_write=False)
 
 # Buchstabenbereiche definieren
 letters = {
-    "O": range(0, 4),   # LED1-LED10
-    "N": range(4, 8),  # LED11-LED23
-    "A": range(8, 12),  # LED24-LED33
-    "I": range(12, 16),  # LED34-LED38
-    "R": range(16, 22)   # LED39-LED50
+    "O": range(0, 10),   # LED1-LED10
+    "N": range(10, 23),  # LED11-LED23
+    "A": range(23, 33),  # LED24-LED33
+    "I": range(33, 38),  # LED34-LED38
+    "R": range(38, 50)   # LED39-LED50
 }
 
 # Twitch-Status speichern

@@ -3,11 +3,11 @@
         {
 			"name": "ehajo",
             "letters": {
-                "O": {"color": [255, 112, 45], "brightness": 0.5},
-                "N": {"color": [0, 117, 179], "brightness": 0.5},
-                "A": {"color": [0, 117, 179], "brightness": 0.5},
-                "I": {"color": [0, 117, 179], "brightness": 0.5},
-                "R": {"color": [0, 117, 179], "brightness": 0.5}
+                "O": {"color": [255, 112, 45], "brightness": 0.3},
+                "N": {"color": [0, 117, 179], "brightness": 0.3},
+                "A": {"color": [0, 117, 179], "brightness": 0.3},
+                "I": {"color": [0, 117, 179], "brightness": 0.3},
+                "R": {"color": [0, 117, 179], "brightness": 0.3}
             }
 		},
         {
@@ -21,13 +21,13 @@
             }
 		},
         {
-			"name": "jvpeek",
+			"name": "danielspringwald",
             "letters": {
-                "O": {"color": [0, 0, 255], "brightness": 0.3},
-                "N": {"color": [0, 0, 255], "brightness": 0.3},
-                "A": {"color": [0, 0, 255], "brightness": 0.3},
-                "I": {"color": [0, 0, 255], "brightness": 0.3},
-                "R": {"color": [0, 0, 255], "brightness": 0.3}
+                "O": {"color": [0, 100, 255], "brightness": 0.1},
+                "N": {"color": [0, 100, 255], "brightness": 0.1},
+                "A": {"color": [0, 100, 255], "brightness": 0.1},
+                "I": {"color": [0, 100, 255], "brightness": 0.1},
+                "R": {"color": [0, 100, 255], "brightness": 0.1}
             }
 		}
     ],
