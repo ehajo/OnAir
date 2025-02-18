@@ -1,12 +1,12 @@
 CAMPlot
 -------
 
-Report Written : 25.11.2024 22:04:47
+Report Written : 15.02.2025 21:42:59
 Design Path    : C:\Users\Hannes\Documents\GitHub\OnAir\PCB\OnAir.pcb
 Design Title   : 
 Created        : 18.11.2024 20:51:21
-Last Saved     : 25.11.2024 22:04:43
-Editing Time   : 405 min
+Last Saved     : 14.02.2025 22:06:12
+Editing Time   : 1372 min
 
 Formatting Information
 ----------------------
@@ -51,13 +51,14 @@ Plot Details
 
     D-Code   Description
 
-    D15      Round 0.50
-    D16      Round 0.30
-    D17      Round 0.41-
-    D18      Round 0.70
-    D19      Round 0.60
-    D70      Round 0.20+
-    D71      Round 0.25+
+    D14      Round 0.50
+    D15      Round 0.30
+    D16      Round 0.41-
+    D17      Round 0.70
+    D18      Round 0.60
+    D19      Round 0.20+
+    D70      Round 0.25+
+    D71      Round 0.64-
     D20      Rectangle 1.00 x 1.50 Rotation 90
     D21      Rectangle 1.00 x 1.50 Rotation 30
     D22      Rectangle 1.00 x 1.50
@@ -68,9 +69,9 @@ Plot Details
     D27      Rectangle 1.00 x 1.50 Rotation 45
     D28      Rectangle 1.00 x 1.50 Rotation 135
     D29      Rectangle 1.00 x 1.50 Rotation 24
+    D72      Oval 0.85 x 1.35
     D73      Rectangle 0.30 x 1.00
-    D74      Round 0.64-
-    D81      Oval 0.85 x 1.35
+    D74      Oval 0.85 x 1.35 Rotation 90
 
     Gerber Output
     -------------
@@ -89,20 +90,23 @@ Plot Details
 
     D-Code   Description
 
-    D15      Round 0.50
-    D16      Round 0.30
+    D14      Round 0.50
+    D15      Round 0.30
+    D16      Round 0.70
     D17      Round 0.41-
-    D18      Round 0.70
-    D19      Round 0.60
-    D70      Round 0.20+
-    D74      Round 0.64-
-    D75      Round 1.27
-    D76      Rectangle 0.90 x 1.40 Rotation 90
-    D78      Rectangle 0.90 x 1.40
-    D80      Rectangle 1.40 x 3.60
-    D81      Rectangle 0.70 x 2.00
-    D82      Oval 0.85 x 1.35
-    D83      Rectangle 1.00 x 1.80 Rotation 90
+    D18      Round 1.27
+    D19      Round 0.64-
+    D70      Round 0.60
+    D71      Round 0.20+
+    D20      Rectangle 0.90 x 1.40 Rotation 90
+    D21      Rectangle 0.70 x 2.00
+    D22      Oval 0.85 x 1.35
+    D23      Rectangle 1.00 x 1.80 Rotation 90
+    D24      Rectangle 1.40 x 3.60
+    D25      Rectangle 0.90 x 1.40
+    D26      Rectangle 0.70 x 2.00 Rotation 90
+    D27      Oval 0.85 x 1.35 Rotation 90
+    D28      Rectangle 1.10 x 1.20 Rotation 90
 
     Gerber Output
     -------------
@@ -124,8 +128,8 @@ Plot Details
     D10      Round 0.30
     D11      Round 0.20
     D12      Round 0.00+
-    D14      Round 0.20+
-    D81      Round 0.15
+    D13      Round 0.20+
+    D14      Round 0.15
 
     Gerber Output
     -------------
@@ -144,20 +148,21 @@ Plot Details
 
     D-Code   Description
 
-    D81      Round 0.95+
-    D82      Round 0.85+
-    D83      Rectangle 1.25+ x 1.75+ Rotation 90
-    D84      Rectangle 1.25+ x 1.75+ Rotation 30
-    D85      Rectangle 1.25+ x 1.75+
-    D86      Rectangle 1.25+ x 1.75+ Rotation 150
-    D87      Rectangle 1.25+ x 1.75+ Rotation 23
-    D88      Rectangle 1.25+ x 1.75+ Rotation 163
-    D89      Rectangle 1.25+ x 1.75+ Rotation 17
-    D90      Rectangle 1.25+ x 1.75+ Rotation 45
-    D91      Rectangle 1.25+ x 1.75+ Rotation 135
-    D92      Rectangle 1.25+ x 1.75+ Rotation 24
-    D93      Oval 1.10+ x 1.60+
-    D94      Rectangle 0.55+ x 1.25+
+    D14      Round 0.95+
+    D15      Round 0.85+
+    D16      Rectangle 1.25+ x 1.75+ Rotation 90
+    D17      Rectangle 1.25+ x 1.75+ Rotation 30
+    D18      Rectangle 1.25+ x 1.75+
+    D19      Rectangle 1.25+ x 1.75+ Rotation 150
+    D70      Rectangle 1.25+ x 1.75+ Rotation 23
+    D71      Rectangle 1.25+ x 1.75+ Rotation 163
+    D20      Rectangle 1.25+ x 1.75+ Rotation 17
+    D21      Rectangle 1.25+ x 1.75+ Rotation 45
+    D22      Rectangle 1.25+ x 1.75+ Rotation 135
+    D23      Rectangle 1.25+ x 1.75+ Rotation 24
+    D24      Oval 1.10+ x 1.60+
+    D25      Rectangle 0.55+ x 1.25+
+    D26      Oval 1.10+ x 1.60+ Rotation 90
 
     Gerber Output
     -------------
@@ -176,17 +181,17 @@ Plot Details
 
     D-Code   Description
 
-    D20      Rectangle 1.00 x 1.50 Rotation 90
-    D21      Rectangle 1.00 x 1.50 Rotation 30
-    D22      Rectangle 1.00 x 1.50
-    D23      Rectangle 1.00 x 1.50 Rotation 150
-    D24      Rectangle 1.00 x 1.50 Rotation 23
-    D25      Rectangle 1.00 x 1.50 Rotation 163
-    D26      Rectangle 1.00 x 1.50 Rotation 17
-    D27      Rectangle 1.00 x 1.50 Rotation 45
-    D28      Rectangle 1.00 x 1.50 Rotation 135
-    D29      Rectangle 1.00 x 1.50 Rotation 24
-    D73      Rectangle 0.30 x 1.00
+    D14      Rectangle 1.00 x 1.50 Rotation 90
+    D15      Rectangle 1.00 x 1.50 Rotation 30
+    D16      Rectangle 1.00 x 1.50
+    D17      Rectangle 1.00 x 1.50 Rotation 150
+    D18      Rectangle 1.00 x 1.50 Rotation 23
+    D19      Rectangle 1.00 x 1.50 Rotation 163
+    D70      Rectangle 1.00 x 1.50 Rotation 17
+    D71      Rectangle 1.00 x 1.50 Rotation 45
+    D20      Rectangle 1.00 x 1.50 Rotation 135
+    D21      Rectangle 1.00 x 1.50 Rotation 24
+    D22      Rectangle 0.30 x 1.00
 
     Gerber Output
     -------------
@@ -208,9 +213,10 @@ Plot Details
     D10      Round 0.30
     D11      Round 0.20
     D12      Round 0.00+
-    D13      Round 0.20
-    D81      Round 0.45
-    D82      Round 0.25
+    D13      Round 0.20+
+    D14      Round 0.20
+    D15      Round 0.45
+    D16      Round 0.25
 
     Gerber Output
     -------------
@@ -229,14 +235,17 @@ Plot Details
 
     D-Code   Description
 
-    D81      Round 0.95+
-    D82      Round 0.85+
-    D83      Rectangle 1.15+ x 1.65+ Rotation 90
-    D84      Rectangle 0.95+ x 2.25+
-    D85      Oval 1.10+ x 1.60+
-    D86      Rectangle 1.25+ x 2.05+ Rotation 90
-    D87      Rectangle 1.65+ x 3.85+
-    D88      Rectangle 1.15+ x 1.65+
+    D14      Round 0.95+
+    D15      Round 0.85+
+    D16      Rectangle 1.15+ x 1.65+ Rotation 90
+    D17      Rectangle 0.95+ x 2.25+
+    D18      Oval 1.10+ x 1.60+
+    D19      Rectangle 1.25+ x 2.05+ Rotation 90
+    D70      Rectangle 1.65+ x 3.85+
+    D71      Rectangle 1.15+ x 1.65+
+    D20      Rectangle 0.95+ x 2.25+ Rotation 90
+    D21      Oval 1.10+ x 1.60+ Rotation 90
+    D22      Rectangle 1.35+ x 1.45+ Rotation 90
 
     Gerber Output
     -------------
@@ -255,11 +264,13 @@ Plot Details
 
     D-Code   Description
 
-    D76      Rectangle 0.90 x 1.40 Rotation 90
-    D78      Rectangle 0.90 x 1.40
-    D80      Rectangle 1.40 x 3.60
-    D81      Rectangle 0.70 x 2.00
-    D82      Rectangle 1.00 x 1.80 Rotation 90
+    D14      Rectangle 0.90 x 1.40 Rotation 90
+    D15      Rectangle 0.70 x 2.00
+    D16      Rectangle 1.00 x 1.80 Rotation 90
+    D17      Rectangle 1.40 x 3.60
+    D18      Rectangle 0.90 x 1.40
+    D19      Rectangle 0.70 x 2.00 Rotation 90
+    D70      Rectangle 1.10 x 1.20 Rotation 90
 
     Gerber Output
     -------------
@@ -278,20 +289,20 @@ Plot Details
 
     D-Code   Description
 
-    D81      Round 0.40
-    D82      Round 0.10
-    D83      Round 0.30
-    D84      Round 3.10
-    D85      Round 0.60
+    D14      Round 0.40
+    D15      Round 0.10
+    D16      Round 0.30
+    D17      Round 3.10
+    D18      Round 0.60
 
     Drill Table
     -----------
     Diam (thou)	Qty	Id	Plated
 
-    11.8	135 	AC	Yes
+    11.8	134 	AC	Yes
     15.7	53  	A	Yes
     122.0	4   	Q	No
-    23.6	4   	AE	Yes
+    23.6	8   	AE	Yes
 
 
 
@@ -317,9 +328,9 @@ Plot Details
 
     Tool          Size     Count  Plated
 
-    T001        000.30000   135     Y
+    T001        000.30000   134     Y
     T002        000.40000    53     Y
-    T003        000.60000     4     Y
+    T003        000.60000     8     Y
     T004        003.10000     4     
 
 Summary Information
@@ -352,6 +363,6 @@ Summary Information
     Layer Wires Bottom
     Layer Construction Lines
 
-Plotting took 0.325 Seconds
+Plotting took 0.322 Seconds
 
                 ---------------- End Of Report ----------------
