@@ -59,7 +59,7 @@ Dieses Repository enthält den Code, die Konfigurationsdateien und eine Anleitun
    - Gehe zu [dev.twitch.tv](https://dev.twitch.tv/) und melde dich mit deinem Twitch-Konto an.
    - Klicke auf **"Your Console"** > **"Applications"** > **"Register Your Application"**.
    - Fülle die Felder aus:
-     - Name: z. B. "TwitchOnAirLED"
+     - Name: z. B. "OnAir"
      - OAuth Redirect URI: `http://localhost` (wird hier nicht wirklich benötigt)
      - Category: "Other"
    - Klicke auf **"Create"** und notiere dir die **Client-ID**.
