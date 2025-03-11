@@ -45,11 +45,13 @@ Dieses Repository enthält den Code, die Konfigurationsdateien und eine Anleitun
    - Entpacke die ZIP-Datei.
 
 2. **Erforderliche Bibliotheken kopieren**:
+   - Die libs befinden sich im lib-Ordner auf Twitch und stellen den Stand von Adafruit dar, mit dem die Software funktioniert. Für aktuellere libs:
    - Öffne das entpackte Verzeichnis und navigiere zum `lib`-Ordner.
    - Kopiere die folgenden Dateien/Ordner auf das `CIRCUITPY`-Laufwerk in den `lib`-Ordner (falls dieser nicht existiert, erstelle ihn):
      - `adafruit_requests.mpy`
      - `neopixel.mpy`
      - `adafruit_pixelbuf.mpy` (wird von `neopixel` benötigt)
+	 - `adafruit_connection_manager.mpy`
    - Beispiel: `CIRCUITPY/lib/adafruit_requests.mpy`
 
 ### Schritt 3: Twitch OAuth-Token erstellen
