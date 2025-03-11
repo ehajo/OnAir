@@ -75,7 +75,7 @@ Dieses Repository enthält den Code, die Konfigurationsdateien und eine Anleitun
 2. **Dateien anpassen**:
    - Öffne `secrets.json` und fülle die Felder mit deinen Daten:
    - Inhalt:
-     {
+     ```{
          "wifi": {
              "ssid": "DEIN_WLAN_NAME",
              "password": "DEIN_WLAN_PASSWORT"
@@ -84,10 +84,10 @@ Dieses Repository enthält den Code, die Konfigurationsdateien und eine Anleitun
              "client_id": "DEINE_CLIENT_ID",
              "access_token": "DEIN_ACCESS_TOKEN"
          }
-     }
+     }```
    - Öffne `config.json`, um die Twitch-Kanäle und Farben anzupassen (optional, Standardwerte funktionieren bereits):
    - Inhalt:
-     {
+     ```{
          "channels": [
              {
                  "name": "ehajo",
@@ -101,7 +101,7 @@ Dieses Repository enthält den Code, die Konfigurationsdateien und eine Anleitun
              }
          ],
          "offline_color": [50, 50, 50]
-     }
+     }```
 
 3. **Dateien auf den Pico W kopieren**:
    - Kopiere die folgenden Dateien auf das `CIRCUITPY`-Laufwerk:
@@ -137,6 +137,6 @@ Dieses Repository enthält den Code, die Konfigurationsdateien und eine Anleitun
 Dieses Projekt ist unter der [MIT-Lizenz](LICENSE) veröffentlicht. Du kannst es frei nutzen, modifizieren und weitergeben.
 
 ## Kontakt
-Bei Fragen oder Problemen erstelle ein [Issue](https://github.com/[DEIN_USERNAME]/[DEIN_REPOSITORY]/issues) oder kontaktiere [DEIN_USERNAME] direkt.
+Bei Fragen oder Problemen erstelle ein [Issue](https://github.com/ehajo/OnAir/issues)!
 
 Happy Streaming!
