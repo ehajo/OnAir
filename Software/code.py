@@ -61,16 +61,28 @@ def connecting_effect():
 def standby_effect(offline_color):
     print("Standby-Modus")
     base_brightness = 0.2  # Grundhelligkeit (20 % der Offline-Farbe)
-    pulse_range = 0.2  # Pulsieren um +/-30 % der Grundhelligkeit
+    pulse_range = 0.2  # Pulsieren um +/-20 % der Grundhelligkeit
     steps = 50  # Anzahl der Schritte pro Puls
     delay = 0.05  # Verzögerung zwischen den Schritten
 
+    # Berechne einmalig die Starthelligkeit
+    start_brightness = base_brightness
+    adjusted_color = [int(c * start_brightness) for c in offline_color]
+    pixels.fill(adjusted_color)
+    pixels.show()
+
+    # Puls-Schleife
     for brightness_factor in list(range(0, steps)) + list(range(steps, 0, -1)):
         brightness = base_brightness + pulse_range * (brightness_factor / steps)
         adjusted_color = [int(c * brightness) for c in offline_color]
         pixels.fill(adjusted_color)
         pixels.show()
         time.sleep(delay)
+
+    # Setze die LEDs am Ende explizit auf die Starthelligkeit zurück
+    adjusted_color = [int(c * base_brightness) for c in offline_color]
+    pixels.fill(adjusted_color)
+    pixels.show()
 
 # Knight Rider Effekt für Buchstaben
 def knight_rider_effect(letters, color, cycles=4):
@@ -103,10 +115,20 @@ def is_channel_online(channel_name, requests):
     }
     try:
         response = requests.get(url, headers=headers)
-        data = response.json()
-        return "data" in data and len(data["data"]) > 0
+        if response.status_code == 200:
+            data = response.json()
+            return "data" in data and len(data["data"]) > 0
+        elif response.status_code == 401:
+            print(f"Twitch API error for {channel_name}: Invalid or expired access token (401)")
+            return False
+        elif response.status_code == 429:
+            print(f"Twitch API error for {channel_name}: Rate limit exceeded (429)")
+            return False
+        else:
+            print(f"Twitch API error for {channel_name}: Unexpected status code {response.status_code}")
+            return False
     except Exception as e:
-        print(f"Error checking Twitch channel: {e}")
+        print(f"Error checking Twitch channel {channel_name}: {e}")
         return False
 
 # Setze die LEDs für die Buchstaben basierend auf der Konfiguration
@@ -120,26 +142,40 @@ def set_letter_colors(channel_config):
             pixels[i] = adjusted_color
     pixels.show()
 
+def connect_wifi():
+    max_retries = 5
+    for attempt in range(max_retries):
+        try:
+            print(f"Connecting to WiFi: {secrets['wifi']['ssid']}... (Attempt {attempt + 1}/{max_retries})")
+            wifi.radio.connect(secrets["wifi"]["ssid"], secrets["wifi"]["password"])
+            print("Connected to WiFi!")
+            return True
+        except Exception as e:
+            print(f"WiFi connection failed: {e}")
+            time.sleep(2)  # Warte 2 Sekunden vor erneutem Versuch
+    return False
+
 # Hauptprogramm
 def main():
     global last_online_channel
     try:
-        connecting_effect()  # Zeige Verbindungsaufnahme-Effekt EINMAL
+        connecting_effect()
+        if not connect_wifi():
+            raise Exception("Could not connect to WiFi after retries")
 
-        # WLAN-Verbindung herstellen
-        print(f"Connecting to WiFi: {secrets['wifi']['ssid']}...")
-        wifi.radio.connect(secrets["wifi"]["ssid"], secrets["wifi"]["password"])
-        print("Connected to WiFi!")
-
-        # Socketpool und SSL-Kontext einrichten
         pool = socketpool.SocketPool(wifi.radio)
         ssl_context = ssl.create_default_context()
         requests = adafruit_requests.Session(pool, ssl_context)
-
         print("Ready to check Twitch status!")
 
-        # Hauptloop
         while True:
+            if not wifi.radio.connected:
+                print("WiFi connection lost, attempting to reconnect...")
+                if not connect_wifi():
+                    raise Exception("Reconnection failed")
+                pool = socketpool.SocketPool(wifi.radio)
+                requests = adafruit_requests.Session(pool, ssl_context)
+
             current_online_channel = None
             for channel in config["channels"]:
                 if is_channel_online(channel["name"], requests):
@@ -148,20 +184,20 @@ def main():
 
             if current_online_channel:
                 if current_online_channel != last_online_channel:
-                    # Wechsel zu einem neuen Kanal
-                    knight_rider_effect(letters, [255, 0, 0])  # Knight Rider Effekt in Rot
-                    set_letter_colors(current_online_channel)  # Setze Farben und Helligkeit
+                    knight_rider_effect(letters, [255, 0, 0])
+                    set_letter_colors(current_online_channel)
                 else:
-                    set_letter_colors(current_online_channel)  # Halte die Farben aufrecht
+                    set_letter_colors(current_online_channel)
             else:
-                standby_effect(config["offline_color"])  # Standby-Modus
+                standby_effect(config["offline_color"])  # Einmaliger Aufruf
 
             last_online_channel = current_online_channel
-            time.sleep(5)  # Verkürzte Pause für reaktionsschnelle Updates
+            time.sleep(10)
+
     except Exception as e:
         print(f"Error: {e}")
-        error_effect()  # Zeige Fehlerzustand
-        time.sleep(5)  # Warte kurz vor erneutem Versuch
+        error_effect()
+        time.sleep(5)
 
 # Programm starten
 main()
