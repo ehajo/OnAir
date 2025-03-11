@@ -75,33 +75,37 @@ Dieses Repository enthält den Code, die Konfigurationsdateien und eine Anleitun
 2. **Dateien anpassen**:
    - Öffne `secrets.json` und fülle die Felder mit deinen Daten:
    - Inhalt:
-     ```{
-         "wifi": {
-             "ssid": "DEIN_WLAN_NAME",
-             "password": "DEIN_WLAN_PASSWORT"
-         },
-         "twitch": {
-             "client_id": "DEINE_CLIENT_ID",
-             "access_token": "DEIN_ACCESS_TOKEN"
-         }
-     }```
+```
+{
+    "wifi": {
+        "ssid": "DEIN_WLAN_NAME",
+        "password": "DEIN_WLAN_PASSWORT"
+        },
+    "twitch": {
+        "client_id": "DEINE_CLIENT_ID",
+        "access_token": "DEIN_ACCESS_TOKEN"
+    }
+}
+ ```
    - Öffne `config.json`, um die Twitch-Kanäle und Farben anzupassen (optional, Standardwerte funktionieren bereits):
    - Inhalt:
-     ```{
-         "channels": [
-             {
-                 "name": "ehajo",
-                 "letters": {
-                     "O": {"color": [255, 112, 45], "brightness": 0.3},
-                     "N": {"color": [0, 117, 179], "brightness": 0.3},
-                     "A": {"color": [0, 117, 179], "brightness": 0.3},
-                     "I": {"color": [0, 117, 179], "brightness": 0.3},
-                     "R": {"color": [0, 117, 179], "brightness": 0.3}
-                 }
-             }
-         ],
-         "offline_color": [50, 50, 50]
-     }```
+```
+{
+	"channels": [
+		{
+		"name": "ehajo",
+			"letters": {
+				"O": {"color": [255, 112, 45], "brightness": 0.3},
+                "N": {"color": [0, 117, 179], "brightness": 0.3},
+                "A": {"color": [0, 117, 179], "brightness": 0.3},
+                "I": {"color": [0, 117, 179], "brightness": 0.3},
+                "R": {"color": [0, 117, 179], "brightness": 0.3}
+                }
+		}
+    ],
+    "offline_color": [50, 50, 50]
+}
+```
 
 3. **Dateien auf den Pico W kopieren**:
    - Kopiere die folgenden Dateien auf das `CIRCUITPY`-Laufwerk:
