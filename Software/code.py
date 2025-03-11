@@ -36,7 +36,7 @@ last_online_channel = None
 # Fehlerzustand: LEDs blinken rot
 def error_effect():
     print("Error detected!")
-    for _ in range(10):  # 5 Sekunden (10 Blinks à 0.5 Sekunden)
+    for _ in range(5):  # 2.5 Sekunden (5 Blinks à 0.5 Sekunden)
         pixels.fill([255, 0, 0])  # Rot
         pixels.show()
         time.sleep(0.25)
@@ -47,19 +47,18 @@ def error_effect():
 # Verbindungsaufnahme: LEDs leuchten langsam auf und ab in Gelb
 def connecting_effect():
     print("Connecting to network...")
-    for _ in range(5):  # Effekt für 5 Sekunden
+    for _ in range(3):  # Effekt für 3 Sekunden
         for brightness in range(0, 256, 10):  # Hochdimmen
             pixels.fill([brightness // 4, brightness // 4, 0])  # Gelb
             pixels.show()
-            time.sleep(0.02)
+            time.sleep(0.01)
         for brightness in range(255, -1, -10):  # Abdimmen
             pixels.fill([brightness // 4, brightness // 4, 0])  # Gelb
             pixels.show()
-            time.sleep(0.02)
+            time.sleep(0.01)
 
 # Standby-Modus: Alle LEDs langsam faden
 def standby_effect(offline_color):
-    print("Standby-Modus")
     base_brightness = 0.2  # Grundhelligkeit (20 % der Offline-Farbe)
     pulse_range = 0.2  # Pulsieren um +/-20 % der Grundhelligkeit
     steps = 50  # Anzahl der Schritte pro Puls
@@ -142,40 +141,48 @@ def set_letter_colors(channel_config):
             pixels[i] = adjusted_color
     pixels.show()
 
-def connect_wifi():
-    max_retries = 5
-    for attempt in range(max_retries):
+# Funktion für Wiederholungsversuche der WLAN-Verbindung
+def connect_to_wifi(max_retries=5, retry_delay=5):
+    attempt = 0
+    while attempt < max_retries:
         try:
-            print(f"Connecting to WiFi: {secrets['wifi']['ssid']}... (Attempt {attempt + 1}/{max_retries})")
+            print(f"Connecting to WiFi: {secrets['wifi']['ssid']} (Attempt {attempt + 1}/{max_retries})...")
             wifi.radio.connect(secrets["wifi"]["ssid"], secrets["wifi"]["password"])
             print("Connected to WiFi!")
-            return True
+            return True  # Erfolgreich verbunden
         except Exception as e:
             print(f"WiFi connection failed: {e}")
-            time.sleep(2)  # Warte 2 Sekunden vor erneutem Versuch
-    return False
+            attempt += 1
+            if attempt < max_retries:
+                print(f"Retrying in {retry_delay} seconds...")
+                error_effect()  # Zeige Fehlerzustand
+                time.sleep(retry_delay)
+            else:
+                print("Max retries reached. Could not connect to WiFi.")
+                return False  # Verbindung endgültig fehlgeschlagen
 
 # Hauptprogramm
 def main():
     global last_online_channel
-    try:
-        connecting_effect()
-        if not connect_wifi():
-            raise Exception("Could not connect to WiFi after retries")
-
-        pool = socketpool.SocketPool(wifi.radio)
-        ssl_context = ssl.create_default_context()
-        requests = adafruit_requests.Session(pool, ssl_context)
-        print("Ready to check Twitch status!")
-
+    
+    # WLAN-Verbindung mit Wiederholungslogik herstellen
+    connecting_effect()  # Zeige Verbindungsaufnahme-Effekt EINMAL
+    if not connect_to_wifi():
+        # Wenn die Verbindung nach max_retries fehlschlägt, endlos im Fehlerzustand bleiben
         while True:
-            if not wifi.radio.connected:
-                print("WiFi connection lost, attempting to reconnect...")
-                if not connect_wifi():
-                    raise Exception("Reconnection failed")
-                pool = socketpool.SocketPool(wifi.radio)
-                requests = adafruit_requests.Session(pool, ssl_context)
+            print("Error-Modus")
+            standby_effect([50, 0, 0])  # Standby-Modus
+            time.sleep(5)
+    
+    # Socketpool und SSL-Kontext einrichten
+    pool = socketpool.SocketPool(wifi.radio)
+    ssl_context = ssl.create_default_context()
+    requests = adafruit_requests.Session(pool, ssl_context)
+    print("Ready to check Twitch status!")
 
+    # Hauptloop
+    while True:
+        try:
             current_online_channel = None
             for channel in config["channels"]:
                 if is_channel_online(channel["name"], requests):
@@ -184,20 +191,27 @@ def main():
 
             if current_online_channel:
                 if current_online_channel != last_online_channel:
-                    knight_rider_effect(letters, [255, 0, 0])
-                    set_letter_colors(current_online_channel)
+                    # Wechsel zu einem neuen Kanal
+                    knight_rider_effect(letters, [255, 0, 0])  # Knight Rider Effekt in Rot
+                    set_letter_colors(current_online_channel)  # Setze Farben und Helligkeit
                 else:
-                    set_letter_colors(current_online_channel)
+                    set_letter_colors(current_online_channel)  # Halte die Farben aufrecht
             else:
-                standby_effect(config["offline_color"])  # Einmaliger Aufruf
+                print("Standby-Modus")
+                standby_effect(config["offline_color"])  # Standby-Modus
 
             last_online_channel = current_online_channel
-            time.sleep(10)
+            time.sleep(5)  # Verkürzte Pause für reaktionsschnelle Updates
 
-    except Exception as e:
-        print(f"Error: {e}")
-        error_effect()
-        time.sleep(5)
+        except Exception as e:
+            print(f"Error in main loop: {e}")
+            error_effect()  # Zeige Fehlerzustand
+            time.sleep(5)  # Warte kurz vor erneutem Versuch
+            # Prüfe WLAN-Verbindung und versuche Wiederverbindung
+            if not wifi.radio.connected:
+                print("WiFi disconnected. Attempting to reconnect...")
+                if not connect_to_wifi():
+                    print("Reconnection failed. Continuing in offline mode...")
 
 # Programm starten
 main()
