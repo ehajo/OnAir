@@ -1,12 +1,12 @@
 CAMPlot
 -------
 
-Report Written : 11.03.2025 09:18:29
+Report Written : 11.03.2025 13:01:53
 Design Path    : C:\Users\Hannes\Documents\GitHub\OnAir\PCB\OnAir.pcb
 Design Title   : 
 Created        : 18.11.2024 20:51:21
-Last Saved     : 11.03.2025 09:18:14
-Editing Time   : 1404 min
+Last Saved     : 11.03.2025 12:26:55
+Editing Time   : 1627 min
 
 Formatting Information
 ----------------------
@@ -91,6 +91,6 @@ Summary Information
     Layer Wires Bottom
     Layer Construction Lines
 
-Plotting took 0.275 Seconds
+Plotting took 0.246 Seconds
 
                 ---------------- End Of Report ----------------
