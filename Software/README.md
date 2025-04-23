@@ -72,7 +72,7 @@ Dieses Repository enthält den Code, die Konfigurationsdateien und eine Anleitun
    ### Schritt 4: Projekt-Dateien auf den Pico W kopieren
 1. **Repository herunterladen**:
    - Lade dieses GitHub-Repository als ZIP-Datei herunter und entpacke es, oder klone es mit Git:
-   - Befehl: git clone https://github.com/[DEIN_USERNAME]/[DEIN_REPOSITORY].git
+   - Befehl: git clone https://github.com/ehajo/OnAir.git
 
 2. **Dateien anpassen**:
    - Öffne `secrets.json` und fülle die Felder mit deinen Daten:
