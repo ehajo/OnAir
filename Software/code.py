@@ -7,7 +7,7 @@ import ssl
 import socketpool
 import adafruit_requests
 
-# JSON-Dateien laden
+# ---------- Hilfsfunktionen: JSON laden ----------
 def load_json(filename):
     with open(filename, "r") as file:
         return json.load(file)
@@ -16,12 +16,12 @@ def load_json(filename):
 secrets = load_json("secrets.json")
 config = load_json("config.json")
 
-# NeoPixel-Setup
+# ---------- NeoPixel-Setup ----------
 pixel_pin = board.GP2
 num_pixels = 50  # Anzahl der LEDs
 pixels = neopixel.NeoPixel(pixel_pin, num_pixels, auto_write=False)
 
-# Buchstabenbereiche definieren
+# Feste Buchstabenbereiche (Hardware ist fix)
 letters = {
     "O": range(0, 10),   # LED1-LED10
     "N": range(10, 23),  # LED11-LED23
@@ -33,44 +33,40 @@ letters = {
 # Twitch-Status speichern
 last_online_channel = None
 
-# Fehlerzustand: LEDs blinken rot
+# ---------- LED-Effekte ----------
 def error_effect():
     print("Error detected!")
-    for _ in range(5):  # 2.5 Sekunden (5 Blinks à 0.5 Sekunden)
+    for _ in range(5):
         pixels.fill([255, 0, 0])  # Rot
         pixels.show()
         time.sleep(0.25)
-        pixels.fill([0, 0, 0])  # Aus
+        pixels.fill([0, 0, 0])    # Aus
         pixels.show()
         time.sleep(0.25)
 
-# Verbindungsaufnahme: LEDs leuchten langsam auf und ab in Gelb
 def connecting_effect():
     print("Connecting to network...")
-    for _ in range(3):  # Effekt für 3 Sekunden
-        for brightness in range(0, 256, 10):  # Hochdimmen
+    for _ in range(3):
+        for brightness in range(0, 256, 10):
             pixels.fill([brightness // 4, brightness // 4, 0])  # Gelb
             pixels.show()
             time.sleep(0.01)
-        for brightness in range(255, -1, -10):  # Abdimmen
+        for brightness in range(255, -1, -10):
             pixels.fill([brightness // 4, brightness // 4, 0])  # Gelb
             pixels.show()
             time.sleep(0.01)
 
-# Standby-Modus: Alle LEDs langsam faden
 def standby_effect(offline_color):
-    base_brightness = 0.2  # Grundhelligkeit (20 % der Offline-Farbe)
-    pulse_range = 0.2  # Pulsieren um +/-20 % der Grundhelligkeit
-    steps = 50  # Anzahl der Schritte pro Puls
-    delay = 0.05  # Verzögerung zwischen den Schritten
+    base_brightness = 0.2
+    pulse_range = 0.2
+    steps = 50
+    delay = 0.05
 
-    # Berechne einmalig die Starthelligkeit
     start_brightness = base_brightness
     adjusted_color = [int(c * start_brightness) for c in offline_color]
     pixels.fill(adjusted_color)
     pixels.show()
 
-    # Puls-Schleife
     for brightness_factor in list(range(0, steps)) + list(range(steps, 0, -1)):
         brightness = base_brightness + pulse_range * (brightness_factor / steps)
         adjusted_color = [int(c * brightness) for c in offline_color]
@@ -78,70 +74,37 @@ def standby_effect(offline_color):
         pixels.show()
         time.sleep(delay)
 
-    # Setze die LEDs am Ende explizit auf die Starthelligkeit zurück
     adjusted_color = [int(c * base_brightness) for c in offline_color]
     pixels.fill(adjusted_color)
     pixels.show()
 
-# Knight Rider Effekt für Buchstaben
-def knight_rider_effect(letters, color, cycles=4):
+def knight_rider_effect(letters_ranges, color, cycles=4):
     print("Knight Rider Effekt (Buchstaben)!")
-    letter_keys = ["O", "N", "A", "I", "R"]  # Feste Reihenfolge der Buchstaben
-
+    letter_keys = ["O", "N", "A", "I", "R"]  # Feste Reihenfolge
     for _ in range(cycles):
-        # Vorwärts durch die Buchstaben
-        for key in letter_keys:
-            pixels.fill([0, 0, 0])  # Alles aus
-            for i in letters[key]:
-                pixels[i] = color  # Buchstabe einschalten
+        for key in letter_keys:  # vorwärts
+            pixels.fill([0, 0, 0])
+            for i in letters_ranges[key]:
+                pixels[i] = color
+            pixels.show()
+            time.sleep(0.06)
+        for key in reversed(letter_keys):  # rückwärts
+            pixels.fill([0, 0, 0])
+            for i in letters_ranges[key]:
+                pixels[i] = color
             pixels.show()
             time.sleep(0.06)
 
-        # Rückwärts durch die Buchstaben
-        for key in reversed(letter_keys):
-            pixels.fill([0, 0, 0])  # Alles aus
-            for i in letters[key]:
-                pixels[i] = color  # Buchstabe einschalten
-            pixels.show()
-            time.sleep(0.06)
-
-# Twitch API-Endpunkt und Header
-def is_channel_online(channel_name, requests):
-    url = f"https://api.twitch.tv/helix/streams?user_login={channel_name}"
-    headers = {
-        "Client-ID": secrets["twitch"]["client_id"],
-        "Authorization": f"Bearer {secrets['twitch']['access_token']}"
-    }
-    try:
-        response = requests.get(url, headers=headers)
-        if response.status_code == 200:
-            data = response.json()
-            return "data" in data and len(data["data"]) > 0
-        elif response.status_code == 401:
-            print(f"Twitch API error for {channel_name}: Invalid or expired access token (401)")
-            return False
-        elif response.status_code == 429:
-            print(f"Twitch API error for {channel_name}: Rate limit exceeded (429)")
-            return False
-        else:
-            print(f"Twitch API error for {channel_name}: Unexpected status code {response.status_code}")
-            return False
-    except Exception as e:
-        print(f"Error checking Twitch channel {channel_name}: {e}")
-        return False
-
-# Setze die LEDs für die Buchstaben basierend auf der Konfiguration
 def set_letter_colors(channel_config):
     for letter, indices in letters.items():
         color = channel_config["letters"].get(letter, {}).get("color", [0, 0, 0])
         brightness = channel_config["letters"].get(letter, {}).get("brightness", 0.5)
+        adjusted_color = [int(c * brightness) for c in color]
         for i in indices:
-            # Passe Helligkeit an
-            adjusted_color = [int(c * brightness) for c in color]
             pixels[i] = adjusted_color
     pixels.show()
 
-# Funktion für Wiederholungsversuche der WLAN-Verbindung
+# ---------- WiFi ----------
 def connect_to_wifi(max_retries=5, retry_delay=5):
     attempt = 0
     while attempt < max_retries:
@@ -149,65 +112,147 @@ def connect_to_wifi(max_retries=5, retry_delay=5):
             print(f"Connecting to WiFi: {secrets['wifi']['ssid']} (Attempt {attempt + 1}/{max_retries})...")
             wifi.radio.connect(secrets["wifi"]["ssid"], secrets["wifi"]["password"])
             print("Connected to WiFi!")
-            return True  # Erfolgreich verbunden
+            return True
         except Exception as e:
             print(f"WiFi connection failed: {e}")
             attempt += 1
             if attempt < max_retries:
                 print(f"Retrying in {retry_delay} seconds...")
-                error_effect()  # Zeige Fehlerzustand
+                error_effect()
                 time.sleep(retry_delay)
             else:
                 print("Max retries reached. Could not connect to WiFi.")
-                return False  # Verbindung endgültig fehlgeschlagen
+                return False
 
-# Hauptprogramm
+# ---------- Twitch Token Management ----------
+# Wir nutzen den Client-Credentials-Flow und speichern das App-Token inkl. Ablaufzeit.
+TWITCH_OAUTH_URL = "https://id.twitch.tv/oauth2/token"
+TWITCH_STREAMS_URL = "https://api.twitch.tv/helix/streams"
+
+_access_token = None
+_token_expiry_epoch = 0  # Zeitpunkt, ab dem neu geholt werden muss
+
+def _now():
+    return time.time()
+
+def get_app_access_token(requests):
+    """
+    Holt ein neues App Access Token (Client Credentials Flow) und setzt Ablaufzeit.
+    """
+    global _access_token, _token_expiry_epoch
+
+    payload = {
+        "client_id": secrets["twitch"]["client_id"],
+        "client_secret": secrets["twitch"]["client_secret"],
+        "grant_type": "client_credentials"
+    }
+
+    # Twitch möchte application/x-www-form-urlencoded
+    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+
+    print("Requesting new Twitch App Access Token...")
+    resp = requests.post(TWITCH_OAUTH_URL, data=payload, headers=headers)
+    if resp.status_code != 200:
+        raise RuntimeError(f"OAuth token request failed: HTTP {resp.status_code} {resp.text}")
+
+    data = resp.json()
+    _access_token = data.get("access_token", None)
+    expires_in = data.get("expires_in", 0)  # Sekunden
+    if not _access_token:
+        raise RuntimeError("No access_token in OAuth response")
+
+    # Einen kleinen Puffer abziehen (z. B. 60 s), damit wir nicht genau auf der Kante sind
+    _token_expiry_epoch = _now() + max(0, int(expires_in) - 60)
+    print("New token acquired; valid for ~", int(expires_in), "seconds (minus safety buffer).")
+
+def ensure_token(requests):
+    """
+    Stellt sicher, dass ein gültiges Token vorhanden ist (holt ggf. ein neues).
+    """
+    if (_access_token is None) or (_now() >= _token_expiry_epoch):
+        get_app_access_token(requests)
+    return _access_token
+
+def is_channel_online(channel_name, requests):
+    """
+    Fragt den Online-Status ab. Bei 401 wird das Token einmal erneuert und der Call wiederholt.
+    """
+    def _call(with_retry=False):
+        token = ensure_token(requests)
+        headers = {
+            "Client-ID": secrets["twitch"]["client_id"],
+            "Authorization": "Bearer " + token
+        }
+        url = f"{TWITCH_STREAMS_URL}?user_login={channel_name}"
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            data = response.json()
+            return True, ("data" in data and len(data["data"]) > 0)
+        elif response.status_code == 401 and not with_retry:
+            # Token vermutlich abgelaufen/ungültig -> neu holen und einmal retry
+            print(f"Twitch 401 for {channel_name}: refreshing token and retrying once...")
+            get_app_access_token(requests)
+            return _call(with_retry=True)
+        elif response.status_code == 429:
+            print(f"Twitch API error for {channel_name}: Rate limit exceeded (429)")
+            return True, False
+        else:
+            print(f"Twitch API error for {channel_name}: HTTP {response.status_code}")
+            return True, False
+
+    try:
+        ok, result = _call()
+        return result if ok else False
+    except Exception as e:
+        print(f"Error checking Twitch channel {channel_name}: {e}")
+        return False
+
+# ---------- Hauptprogramm ----------
 def main():
     global last_online_channel
-    
-    # WLAN-Verbindung mit Wiederholungslogik herstellen
-    connecting_effect()  # Zeige Verbindungsaufnahme-Effekt EINMAL
+
+    # WLAN-Verbindung
+    connecting_effect()
     if not connect_to_wifi():
-        # Wenn die Verbindung nach max_retries fehlschlägt, endlos im Fehlerzustand bleiben
         while True:
             print("Error-Modus")
-            standby_effect([50, 0, 0])  # Standby-Modus
+            standby_effect([50, 0, 0])
             time.sleep(5)
-    
-    # Socketpool und SSL-Kontext einrichten
+
+    # HTTP-Session
     pool = socketpool.SocketPool(wifi.radio)
     ssl_context = ssl.create_default_context()
     requests = adafruit_requests.Session(pool, ssl_context)
     print("Ready to check Twitch status!")
 
-    # Hauptloop
+    # Hauptloop: alle 60 Sekunden prüfen (schont Rate Limits)
     while True:
         try:
             current_online_channel = None
+
+            # Priorität: Reihenfolge in config["channels"]
             for channel in config["channels"]:
                 if is_channel_online(channel["name"], requests):
                     current_online_channel = channel
                     break
 
             if current_online_channel:
-                if current_online_channel != last_online_channel:
-                    # Wechsel zu einem neuen Kanal
-                    knight_rider_effect(letters, [255, 0, 0])  # Knight Rider Effekt in Rot
-                    set_letter_colors(current_online_channel)  # Setze Farben und Helligkeit
+                if current_online_channel is not last_online_channel:
+                    knight_rider_effect(letters, [255, 0, 0])  # Übergang
+                    set_letter_colors(current_online_channel)
                 else:
-                    set_letter_colors(current_online_channel)  # Halte die Farben aufrecht
+                    set_letter_colors(current_online_channel)
             else:
                 print("Standby-Modus")
-                standby_effect(config["offline_color"])  # Standby-Modus
+                standby_effect(config["offline_color"])
 
             last_online_channel = current_online_channel
-            time.sleep(5)  # Verkürzte Pause für reaktionsschnelle Updates
+            time.sleep(60)  # 1 Minute
 
         except Exception as e:
             print(f"Error in main loop: {e}")
-            error_effect()  # Zeige Fehlerzustand
-            time.sleep(5)  # Warte kurz vor erneutem Versuch
-            # Prüfe WLAN-Verbindung und versuche Wiederverbindung
+            error_effect()
+            time.sleep(5)
             if not wifi.radio.connected:
                 print("WiFi disconnected. Attempting to reconnect...")
                 if not connect_to_wifi():
