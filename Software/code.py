@@ -12,9 +12,9 @@ from adafruit_httpserver import Server, Request, Response, JSONResponse, POST, G
 # =========================
 #   Konfiguration
 # =========================
-HTTP_TIMEOUT = 5           # Timeout für HTTP-Requests (Sek.)
-CHECK_INTERVAL = 60        # Sekunden zwischen Twitch-Abfragen
-QUIET_WINDOW_AFTER_HTTP = 3.0  # Sek. Pause nach Webserver-Aktivität, bevor wir Twitch checken
+HTTP_TIMEOUT = 5              # Timeout für HTTP-Requests (Sek.)
+CHECK_INTERVAL = 60           # Sekunden zwischen Twitch-Abfragen
+WEB_LOCK_DURATION_SEC = 30.0  # Sek. Twitch PAUSE nach JEDER Webserver-Aktivität
 
 # =========================
 #   JSON laden/speichern
@@ -49,8 +49,8 @@ letters = {
 
 last_online_channel = None
 
-# Timestamp letzter Webserveraktivität
-last_http_activity = 0.0
+# „Pause bis“-Zeitstempel für Twitch-Checks
+web_lock_until = 0.0
 
 # =========================
 #   LED-Effekte
@@ -146,34 +146,11 @@ def ensure_token(requests):
         get_app_access_token(requests)
     return _access_token
 
-def dns_ok(pool, hostname, retries=2, delay=0.25):
-    """Schneller DNS-Precheck, um -2 Fehler (Name unknown) früh zu erkennen."""
-    for _ in range(retries + 1):
-        try:
-            ai = pool.getaddrinfo(hostname, 443)
-            if ai and len(ai) > 0:
-                return True
-        except Exception as e:
-            pass
-        time.sleep(delay)
-    return False
-
-def is_channel_online(channel_name, requests, server=None, pool=None):
+def is_channel_online(channel_name, requests):
     def _call(retried=False):
         token = ensure_token(requests)
-        headers = {
-            "Client-ID": secrets["twitch"]["client_id"],
-            "Authorization": "Bearer " + token,
-        }
+        headers = {"Client-ID": secrets["twitch"]["client_id"], "Authorization": "Bearer " + token}
         url = f"{TWITCH_STREAMS_URL}?user_login={channel_name}"
-
-        # Zwischen-„Atmen“, damit der Webserver responsiv bleibt
-        if server:
-            try:
-                server.poll()
-            except Exception as e:
-                print("Server poll vor Request:", e)
-
         r = requests.get(url, headers=headers, timeout=HTTP_TIMEOUT)
         if r.status_code == 200:
             d = r.json()
@@ -192,7 +169,7 @@ def is_channel_online(channel_name, requests, server=None, pool=None):
         ok, res = _call()
         return res if ok else False
     except OSError as e:
-        # EINPROGRESS/ETIMEDOUT/ECONNABORTED: als „offline“ behandeln und weiter
+        # typische Netzfehler als offline behandeln
         if getattr(e, "errno", None) in (errno.EINPROGRESS, errno.ETIMEDOUT, errno.ECONNABORTED):
             print(f"Twitch-Fehler {channel_name}: {e} → offline weiter.")
             return False
@@ -205,13 +182,6 @@ def is_channel_online(channel_name, requests, server=None, pool=None):
 # =========================
 #   Farb-Utilities
 # =========================
-def hex_to_rgb_list(hx):
-    hx = hx.strip()
-    if hx.startswith("#") and len(hx) == 7:
-        r = int(hx[1:3], 16); g = int(hx[3:5], 16); b = int(hx[5:7], 16)
-        return [r, g, b]
-    return [0, 0, 0]
-
 def rgb_list_to_hex(rgb):
     r, g, b = rgb
     return "#{:02X}{:02X}{:02X}".format(int(r), int(g), int(b))
@@ -246,7 +216,7 @@ hr{border:0;border-top:1px solid #eee;margin:14px 0}
 </style>
 </head>
 <body>
-<h1>ONAIR LED – Konfiguration<span id="status" class="badge">lädt…</span></h1>
+<h1>ONAIR LED – Konfiguration<span id="status" class="badge">geladen</span></h1>
 
 <div class="card">
   <h3>Streamer</h3>
@@ -283,7 +253,6 @@ function hexToRgb(h){return [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16)
 async function loadConfig(){
   const r = await fetch("/config");
   cfg = await r.json();
-  document.getElementById("status").textContent = "geladen";
   renderChannels();
   document.getElementById("offlineColor").value = rgbToHex(cfg.offline_color || [50,50,50]);
 }
@@ -303,7 +272,7 @@ function renderChannels(){
         </div>
       </div>
       <div class="grid">
-        ${["O","N","A","I","R"].map(L => {
+        ${letters.map(L => {
           const data = (ch.letters && ch.letters[L]) ? ch.letters[L] : {color:[0,0,0],brightness:0.5};
           const hex = rgbToHex(data.color);
           const br = data.brightness ?? 0.5;
@@ -320,7 +289,7 @@ function renderChannels(){
       </div>
     `;
     wrap.appendChild(div);
-    ["O","N","A","I","R"].forEach(L => {
+    letters.forEach(L => {
       const el = document.getElementById(`${ch.name}_${L}_bri`);
       const lab = document.getElementById(`${ch.name}_${L}_bri_val`);
       el.addEventListener("input",()=>lab.textContent = el.value);
@@ -330,7 +299,7 @@ function renderChannels(){
 
 async function saveChannel(name){
   const payload = { name, letters:{} };
-  ["O","N","A","I","R"].forEach(L => {
+  letters.forEach(L => {
     const hex = document.getElementById(`${name}_${L}_color`).value;
     const bri = parseFloat(document.getElementById(`${name}_${L}_bri`).value);
     payload.letters[L] = { color: hexToRgb(hex), brightness: bri };
@@ -371,8 +340,9 @@ def build_server(pool):
     srv = Server(pool, debug=False)
 
     def touch_http_activity():
-        global last_http_activity
-        last_http_activity = time.monotonic()
+        # Bei JEDEM Request: Twitch für X Sekunden sperren
+        global web_lock_until
+        web_lock_until = time.monotonic() + WEB_LOCK_DURATION_SEC
 
     @srv.route("/", GET)
     def index(request: Request):
@@ -483,7 +453,7 @@ def build_server(pool):
 #   Hauptprogramm
 # =========================
 def main():
-    global last_online_channel, last_http_activity
+    global last_online_channel, web_lock_until
 
     connecting_effect()
     if not connect_to_wifi():
@@ -503,7 +473,7 @@ def main():
     print("Ready to check Twitch status!")
 
     last_check = 0
-    last_http_activity = time.monotonic()
+    web_lock_until = time.monotonic()  # beim Start nicht gesperrt
 
     while True:
         # Webserver-Events abarbeiten (nicht-blockierend)
@@ -514,41 +484,38 @@ def main():
 
         now = time.monotonic()
 
-        # Twitch nur prüfen, wenn:
-        # - Intervall erreicht
-        # - und seit letzter HTTP-Aktivität die Quiet-Zeit verstrichen ist
-        if (now - last_check >= CHECK_INTERVAL) and (now - last_http_activity >= QUIET_WINDOW_AFTER_HTTP):
-            # DNS-Precheck (verhindert socket_resolve_host() -2)
-            if not dns_ok(pool, "id.twitch.tv") or not dns_ok(pool, "api.twitch.tv"):
-                print("DNS nicht bereit, skippe diesen Zyklus.")
-            else:
-                last_check = now
-                try:
-                    current_online_channel = None
-                    for ch in config.get("channels", []):
-                        if is_channel_online(ch["name"], requests, server=server, pool=pool):
-                            current_online_channel = ch
-                            break
-                        # Zwischen jedem Kanal kurz den Server bedienen
-                        try:
-                            server.poll()
-                        except Exception as e:
-                            print("Server poll innerhalb Twitch-Schleife:", e)
+        # Wenn Web-Lock aktiv → Twitch komplett überspringen
+        if now < web_lock_until:
+            # Während der Sperre leicht pulsen, falls kein Stream aktiv
+            if not last_online_channel:
+                standby_effect(config.get("offline_color", [50, 50, 50]))
+            time.sleep(0.01)
+            continue
 
-                    if current_online_channel:
-                        if (not last_online_channel) or (current_online_channel.get("name") != last_online_channel.get("name")):
-                            knight_rider_effect([255, 0, 0], cycles=2)
-                        set_letter_colors(current_online_channel)
-                    else:
-                        standby_effect(config.get("offline_color", [50, 50, 50]))
+        # Regulärer Twitch-Check
+        if now - last_check >= CHECK_INTERVAL:
+            last_check = now
+            try:
+                current_online_channel = None
+                for ch in config.get("channels", []):
+                    if is_channel_online(ch["name"], requests):
+                        current_online_channel = ch
+                        break
 
-                    last_online_channel = current_online_channel
+                if current_online_channel:
+                    if (not last_online_channel) or (current_online_channel.get("name") != last_online_channel.get("name")):
+                        knight_rider_effect([255, 0, 0], cycles=2)
+                    set_letter_colors(current_online_channel)
+                else:
+                    standby_effect(config.get("offline_color", [50, 50, 50]))
 
-                except Exception as e:
-                    print("Main loop Fehler:", e)
-                    error_effect()
-                    if not wifi.radio.connected:
-                        connect_to_wifi()
+                last_online_channel = current_online_channel
+
+            except Exception as e:
+                print("Main loop Fehler:", e)
+                error_effect()
+                if not wifi.radio.connected:
+                    connect_to_wifi()
 
         time.sleep(0.01)
 
