@@ -12,8 +12,9 @@ from adafruit_httpserver import Server, Request, Response, JSONResponse, POST, G
 # =========================
 #   Konfiguration
 # =========================
-HTTP_TIMEOUT = 5         # Sekunden Timeout für HTTP-Requests
-CHECK_INTERVAL = 60      # Sekunden zwischen Twitch-Abfragen
+HTTP_TIMEOUT = 5           # Timeout für HTTP-Requests (Sek.)
+CHECK_INTERVAL = 60        # Sekunden zwischen Twitch-Abfragen
+QUIET_WINDOW_AFTER_HTTP = 3.0  # Sek. Pause nach Webserver-Aktivität, bevor wir Twitch checken
 
 # =========================
 #   JSON laden/speichern
@@ -48,38 +49,30 @@ letters = {
 
 last_online_channel = None
 
+# Timestamp letzter Webserveraktivität
+last_http_activity = 0.0
+
 # =========================
 #   LED-Effekte
 # =========================
 def error_effect():
-    for _ in range(3):
-        pixels.fill([255, 0, 0])
-        pixels.show()
-        time.sleep(0.2)
-        pixels.fill([0, 0, 0])
-        pixels.show()
-        time.sleep(0.2)
+    for _ in range(2):
+        pixels.fill([255, 0, 0]); pixels.show(); time.sleep(0.2)
+        pixels.fill([0, 0, 0]);   pixels.show(); time.sleep(0.2)
 
 def connecting_effect():
     for _ in range(2):
         for b in range(0, 256, 12):
-            pixels.fill([b // 4, b // 4, 0])
-            pixels.show()
-            time.sleep(0.01)
+            pixels.fill([b // 4, b // 4, 0]); pixels.show(); time.sleep(0.01)
         for b in range(255, -1, -12):
-            pixels.fill([b // 4, b // 4, 0])
-            pixels.show()
-            time.sleep(0.01)
+            pixels.fill([b // 4, b // 4, 0]); pixels.show(); time.sleep(0.01)
 
 def standby_effect(offline_color):
-    base_b = 0.2
-    pulse = 0.2
-    steps = 40
+    base_b = 0.2; pulse = 0.2; steps = 40
     for s in range(0, steps):
         b = base_b + pulse * (s / steps)
         col = [int(c * b) for c in offline_color]
-        pixels.fill(col)
-        pixels.show()
+        pixels.fill(col); pixels.show()
         time.sleep(0.005)
 
 def set_letter_colors(channel_cfg):
@@ -145,7 +138,7 @@ def get_app_access_token(requests):
     data = resp.json()
     _access_token = data.get("access_token")
     expires_in = int(data.get("expires_in", 0))
-    _token_expiry_epoch = _now() + max(0, expires_in - 60)  # 60s Sicherheits-Puffer
+    _token_expiry_epoch = _now() + max(0, expires_in - 60)  # 60s Puffer
     print("Token OK; gültig ~", expires_in, "s (mit Puffer).")
 
 def ensure_token(requests):
@@ -153,7 +146,19 @@ def ensure_token(requests):
         get_app_access_token(requests)
     return _access_token
 
-def is_channel_online(channel_name, requests, server=None):
+def dns_ok(pool, hostname, retries=2, delay=0.25):
+    """Schneller DNS-Precheck, um -2 Fehler (Name unknown) früh zu erkennen."""
+    for _ in range(retries + 1):
+        try:
+            ai = pool.getaddrinfo(hostname, 443)
+            if ai and len(ai) > 0:
+                return True
+        except Exception as e:
+            pass
+        time.sleep(delay)
+    return False
+
+def is_channel_online(channel_name, requests, server=None, pool=None):
     def _call(retried=False):
         token = ensure_token(requests)
         headers = {
@@ -187,8 +192,8 @@ def is_channel_online(channel_name, requests, server=None):
         ok, res = _call()
         return res if ok else False
     except OSError as e:
-        # typische Netzfehler: als „offline“ behandeln und sofort weiter
-        if getattr(e, "errno", None) in (errno.ECONNABORTED, errno.ETIMEDOUT):
+        # EINPROGRESS/ETIMEDOUT/ECONNABORTED: als „offline“ behandeln und weiter
+        if getattr(e, "errno", None) in (errno.EINPROGRESS, errno.ETIMEDOUT, errno.ECONNABORTED):
             print(f"Twitch-Fehler {channel_name}: {e} → offline weiter.")
             return False
         print(f"Twitch-Fehler unerwartet {channel_name}: {e}")
@@ -203,9 +208,7 @@ def is_channel_online(channel_name, requests, server=None):
 def hex_to_rgb_list(hx):
     hx = hx.strip()
     if hx.startswith("#") and len(hx) == 7:
-        r = int(hx[1:3], 16)
-        g = int(hx[3:5], 16)
-        b = int(hx[5:7], 16)
+        r = int(hx[1:3], 16); g = int(hx[3:5], 16); b = int(hx[5:7], 16)
         return [r, g, b]
     return [0, 0, 0]
 
@@ -300,7 +303,7 @@ function renderChannels(){
         </div>
       </div>
       <div class="grid">
-        ${letters.map(L => {
+        ${["O","N","A","I","R"].map(L => {
           const data = (ch.letters && ch.letters[L]) ? ch.letters[L] : {color:[0,0,0],brightness:0.5};
           const hex = rgbToHex(data.color);
           const br = data.brightness ?? 0.5;
@@ -317,7 +320,7 @@ function renderChannels(){
       </div>
     `;
     wrap.appendChild(div);
-    letters.forEach(L => {
+    ["O","N","A","I","R"].forEach(L => {
       const el = document.getElementById(`${ch.name}_${L}_bri`);
       const lab = document.getElementById(`${ch.name}_${L}_bri_val`);
       el.addEventListener("input",()=>lab.textContent = el.value);
@@ -327,7 +330,7 @@ function renderChannels(){
 
 async function saveChannel(name){
   const payload = { name, letters:{} };
-  letters.forEach(L => {
+  ["O","N","A","I","R"].forEach(L => {
     const hex = document.getElementById(`${name}_${L}_color`).value;
     const bri = parseFloat(document.getElementById(`${name}_${L}_bri`).value);
     payload.letters[L] = { color: hexToRgb(hex), brightness: bri };
@@ -367,20 +370,25 @@ loadConfig();
 def build_server(pool):
     srv = Server(pool, debug=False)
 
+    def touch_http_activity():
+        global last_http_activity
+        last_http_activity = time.monotonic()
+
     @srv.route("/", GET)
     def index(request: Request):
+        touch_http_activity()
         return Response(request, content_type="text/html", body=HTML_PAGE)
 
     @srv.route("/config", GET)
     def get_config(request: Request):
-        data = {
-            "channels": config.get("channels", []),
-            "offline_color": config.get("offline_color", [50, 50, 50]),
-        }
+        touch_http_activity()
+        data = {"channels": config.get("channels", []),
+                "offline_color": config.get("offline_color", [50, 50, 50])}
         return JSONResponse(request, data)
 
     @srv.route("/save_channel", POST)
     def save_channel(request: Request):
+        touch_http_activity()
         try:
             body = request.json()
             name = body.get("name", "").strip()
@@ -397,14 +405,11 @@ def build_server(pool):
                 return JSONResponse(request, {"ok": False, "err": "channel not found"}, status=404)
 
             found_letters = found.setdefault("letters", {})
-            for L in ["O", "N", "A", "I", "R"]:
+            for L in ["O","N","A","I","R"]:
                 v = new_letters.get(L, {})
                 color = v.get("color", [0, 0, 0])
                 bri = float(v.get("brightness", 0.5))
-                found_letters[L] = {
-                    "color": [int(color[0]), int(color[1]), int(color[2])],
-                    "brightness": bri
-                }
+                found_letters[L] = {"color": [int(color[0]), int(color[1]), int(color[2])], "brightness": bri}
 
             save_json("config.json", config)
 
@@ -419,6 +424,7 @@ def build_server(pool):
 
     @srv.route("/add_channel", POST)
     def add_channel(request: Request):
+        touch_http_activity()
         try:
             body = request.json()
             name = body.get("name", "").strip()
@@ -430,10 +436,7 @@ def build_server(pool):
                     return JSONResponse(request, {"ok": False, "err": "exists"}, status=409)
 
             default = {"color": [0, 117, 179], "brightness": 0.3}
-            new_ch = {
-                "name": name,
-                "letters": {L: dict(default) for L in ["O", "N", "A", "I", "R"]}
-            }
+            new_ch = {"name": name, "letters": {L: dict(default) for L in ["O","N","A","I","R"]}}
             config["channels"].append(new_ch)
             save_json("config.json", config)
             return JSONResponse(request, {"ok": True})
@@ -443,6 +446,7 @@ def build_server(pool):
 
     @srv.route("/delete_channel", POST)
     def delete_channel(request: Request):
+        touch_http_activity()
         try:
             body = request.json()
             name = body.get("name", "").strip()
@@ -462,6 +466,7 @@ def build_server(pool):
 
     @srv.route("/set_offline_color", POST)
     def set_offline_color(request: Request):
+        touch_http_activity()
         try:
             body = request.json()
             color = body.get("color", [50, 50, 50])
@@ -478,7 +483,7 @@ def build_server(pool):
 #   Hauptprogramm
 # =========================
 def main():
-    global last_online_channel
+    global last_online_channel, last_http_activity
 
     connecting_effect()
     if not connect_to_wifi():
@@ -498,6 +503,8 @@ def main():
     print("Ready to check Twitch status!")
 
     last_check = 0
+    last_http_activity = time.monotonic()
+
     while True:
         # Webserver-Events abarbeiten (nicht-blockierend)
         try:
@@ -506,37 +513,43 @@ def main():
             print("Server poll Fehler:", e)
 
         now = time.monotonic()
-        if now - last_check >= CHECK_INTERVAL:
-            last_check = now
-            try:
-                current_online_channel = None
-                for ch in config.get("channels", []):
-                    if is_channel_online(ch["name"], requests, server=server):
-                        current_online_channel = ch
-                        break
-                    # Zwischen jedem Kanal kurz den Server bedienen
-                    try:
-                        server.poll()
-                    except Exception as e:
-                        print("Server poll innerhalb Twitch-Schleife:", e)
 
-                if current_online_channel:
-                    if (not last_online_channel) or (current_online_channel.get("name") != last_online_channel.get("name")):
-                        knight_rider_effect([255, 0, 0], cycles=2)
-                    set_letter_colors(current_online_channel)
-                else:
-                    standby_effect(config.get("offline_color", [50, 50, 50]))
+        # Twitch nur prüfen, wenn:
+        # - Intervall erreicht
+        # - und seit letzter HTTP-Aktivität die Quiet-Zeit verstrichen ist
+        if (now - last_check >= CHECK_INTERVAL) and (now - last_http_activity >= QUIET_WINDOW_AFTER_HTTP):
+            # DNS-Precheck (verhindert socket_resolve_host() -2)
+            if not dns_ok(pool, "id.twitch.tv") or not dns_ok(pool, "api.twitch.tv"):
+                print("DNS nicht bereit, skippe diesen Zyklus.")
+            else:
+                last_check = now
+                try:
+                    current_online_channel = None
+                    for ch in config.get("channels", []):
+                        if is_channel_online(ch["name"], requests, server=server, pool=pool):
+                            current_online_channel = ch
+                            break
+                        # Zwischen jedem Kanal kurz den Server bedienen
+                        try:
+                            server.poll()
+                        except Exception as e:
+                            print("Server poll innerhalb Twitch-Schleife:", e)
 
-                last_online_channel = current_online_channel
+                    if current_online_channel:
+                        if (not last_online_channel) or (current_online_channel.get("name") != last_online_channel.get("name")):
+                            knight_rider_effect([255, 0, 0], cycles=2)
+                        set_letter_colors(current_online_channel)
+                    else:
+                        standby_effect(config.get("offline_color", [50, 50, 50]))
 
-            except Exception as e:
-                print("Main loop Fehler:", e)
-                error_effect()
-                # WiFi Reconnect versuchen, ohne hart zu blockieren
-                if not wifi.radio.connected:
-                    connect_to_wifi()
+                    last_online_channel = current_online_channel
 
-        # Mini-Schlaf, damit CPU atmet
+                except Exception as e:
+                    print("Main loop Fehler:", e)
+                    error_effect()
+                    if not wifi.radio.connected:
+                        connect_to_wifi()
+
         time.sleep(0.01)
 
 # Start
